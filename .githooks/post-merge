@@ -10,4 +10,5 @@ set_tools_venv_python "$root_dir"
 
 "$VENV_PY" -m pip install -r "$root_dir/requirements.txt"
 "$TOOLS_VENV_PY" -m pip install -r "$root_dir/requirements-tools.txt"
+sh "$root_dir/scripts/generate_client.sh"
 sh "$root_dir/scripts/install.sh"
