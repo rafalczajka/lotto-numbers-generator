@@ -13,7 +13,12 @@ _metadata = StrategyMetadata()
 @StrategyRegistry.register('cold-numbers', _metadata)
 class ColdNumbers(AbstractStrategy):
     def __init__(self, params: dict[str, str]) -> None:
-        self._lookback = int(params.get('lookback', _default_params['lookback']))
+        lookback_param = params.get('lookback', _default_params['lookback'])
+
+        try:
+            self._lookback = int(lookback_param)
+        except ValueError as exc:
+            raise ValueError('Parameter lookback must be an integer.') from exc
 
         if self._lookback < 0:
             raise ValueError('Parameter lookback must be a non-negative integer.')
