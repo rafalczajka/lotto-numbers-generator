@@ -26,8 +26,8 @@ class RisingNumbers(AbstractStrategy):
             _default_params['long_lookback'],
         )
 
-        if self._short_lookback > self._long_lookback:
-            raise ValueError('Parameter short_lookback must be less than or equal to long_lookback.')
+        if self._short_lookback >= self._long_lookback:
+            raise ValueError('Parameter short_lookback must be less than long_lookback.')
 
         self._data: list[LottoDrawRecord] = []
 
