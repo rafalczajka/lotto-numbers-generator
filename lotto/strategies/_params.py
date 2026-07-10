@@ -1,3 +1,6 @@
+import math
+
+
 def parse_int_param(params: dict[str, str], name: str, default: str | None = None) -> int | None:
     raw_value = params.get(name, default)
 
@@ -8,6 +11,41 @@ def parse_int_param(params: dict[str, str], name: str, default: str | None = Non
         return int(raw_value)
     except ValueError as exc:
         raise ValueError(f'Parameter {name} must be an integer.') from exc
+
+
+def parse_float_param(params: dict[str, str], name: str, default: str | None = None) -> float | None:
+    raw_value = params.get(name, default)
+
+    if raw_value is None:
+        return None
+
+    try:
+        value = float(raw_value)
+    except ValueError as exc:
+        raise ValueError(f'Parameter {name} must be a number.') from exc
+
+    if not math.isfinite(value):
+        raise ValueError(f'Parameter {name} must be a number.')
+
+    return value
+
+
+def parse_float_between_param(
+    params: dict[str, str],
+    name: str,
+    default: str,
+    min_value: float,
+    max_value: float,
+) -> float:
+    value = parse_float_param(params, name, default)
+
+    if value is None:
+        raise ValueError(f'Parameter {name} is required.')
+
+    if value <= min_value or value >= max_value:
+        raise ValueError(f'Parameter {name} must be greater than {min_value:g} and less than {max_value:g}.')
+
+    return value
 
 
 def parse_non_negative_int_param(params: dict[str, str], name: str, default: str) -> int:
