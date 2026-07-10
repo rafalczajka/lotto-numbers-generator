@@ -1,6 +1,7 @@
 from collections import Counter
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ._validation import parse_positive_int_param
 
 _default_params = {
     'short_lookback': '20',
@@ -14,14 +15,16 @@ _metadata = StrategyMetadata()
 @StrategyRegistry.register('rising-numbers', _metadata)
 class RisingNumbers(AbstractStrategy):
     def __init__(self, params: dict[str, str]) -> None:
-        self._short_lookback = int(params.get('short_lookback', _default_params['short_lookback']))
-        self._long_lookback = int(params.get('long_lookback', _default_params['long_lookback']))
-
-        if self._short_lookback <= 0:
-            raise ValueError('Parameter short_lookback must be a positive integer.')
-
-        if self._long_lookback <= 0:
-            raise ValueError('Parameter long_lookback must be a positive integer.')
+        self._short_lookback = parse_positive_int_param(
+            params,
+            'short_lookback',
+            _default_params['short_lookback'],
+        )
+        self._long_lookback = parse_positive_int_param(
+            params,
+            'long_lookback',
+            _default_params['long_lookback'],
+        )
 
         if self._short_lookback > self._long_lookback:
             raise ValueError('Parameter short_lookback must be less than or equal to long_lookback.')

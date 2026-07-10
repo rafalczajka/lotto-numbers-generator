@@ -1,6 +1,7 @@
 from collections import Counter
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ._validation import parse_non_negative_int_param
 
 _default_params = {
     'lookback': '100',
@@ -13,11 +14,7 @@ _metadata = StrategyMetadata()
 @StrategyRegistry.register('weighted-hot-numbers', _metadata)
 class WeightedHotNumbers(AbstractStrategy):
     def __init__(self, params: dict[str, str]) -> None:
-        self._lookback = int(params.get('lookback', _default_params['lookback']))
-
-        if self._lookback < 0:
-            raise ValueError('Parameter lookback must be a non-negative integer.')
-
+        self._lookback = parse_non_negative_int_param(params, 'lookback', _default_params['lookback'])
         self._data: list[LottoDrawRecord] = []
 
     def prepare_data(self, data: list[LottoDrawRecord]) -> None:

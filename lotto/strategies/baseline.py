@@ -1,6 +1,7 @@
 import random
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ._validation import parse_int_param
 
 _metadata = StrategyMetadata(
     requires_data=False,
@@ -10,16 +11,11 @@ _metadata = StrategyMetadata(
 @StrategyRegistry.register('random', _metadata)
 class Baseline(AbstractStrategy):
     def __init__(self, params: dict[str, str]) -> None:
-        seed_param = params.get('seed')
+        seed = parse_int_param(params, 'seed')
 
-        if seed_param is None:
+        if seed is None:
             self._rng = random.Random()
             return
-
-        try:
-            seed = int(seed_param)
-        except ValueError as exc:
-            raise ValueError('Parameter seed must be an integer.') from exc
 
         self._rng = random.Random(seed)
 
