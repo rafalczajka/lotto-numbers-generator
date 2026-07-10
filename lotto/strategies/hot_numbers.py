@@ -1,7 +1,7 @@
 from collections import Counter
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
-from ._validation import parse_non_negative_int_param
+from ._params import parse_non_negative_int_param
 
 _default_params = {
     'lookback': '100',

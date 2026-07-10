@@ -1,7 +1,7 @@
 import random
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
-from ._validation import parse_int_param
+from ._params import parse_int_param
 
 _metadata = StrategyMetadata(
     requires_data=False,

@@ -1,5 +1,5 @@
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
-from ._validation import parse_numbers_param
+from ._params import parse_numbers_param
 
 _metadata = StrategyMetadata(
     requires_data=False,
