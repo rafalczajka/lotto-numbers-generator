@@ -1,9 +1,9 @@
 attrs==26.1.0
 httpx==0.28.1
 pandas==3.0.3
-plotly==6.8.0
+plotly==6.9.0
 pyinstaller==6.21.0
 pyyaml==6.0.3
 requests==2.34.2
 scipy==1.18.0
-typer==0.26.8
+typer==0.27.0
