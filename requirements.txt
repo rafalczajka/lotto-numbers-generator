@@ -1,6 +1,6 @@
 attrs==26.1.0
 httpx==0.28.1
-pandas==3.0.3
+pandas==3.0.5
 plotly==6.9.0
 pyinstaller==6.21.0
 pyyaml==6.0.3
