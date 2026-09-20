@@ -14,6 +14,34 @@ _metadata = StrategyMetadata()
 
 @StrategyRegistry.register('rising-numbers', _metadata)
 class RisingNumbers(AbstractRankedStrategy):
+    """
+    Pick six numbers from 1 to 49 with the biggest recent rise in frequency.
+
+    Available as 'rising-numbers', this strategy compares how often each
+    number appears per draw in a short recent window and a longer window.
+    The longer window includes the shorter one. Numbers with the largest
+    difference between their short-window and long-window frequencies are
+    picked first. Lotto Plus results are not used.
+
+    Parameters:
+        short_lookback: Number of recent draws used to measure the recent
+            frequency. Must be positive. Defaults to 20.
+        long_lookback: Number of recent draws used for comparison. Must be
+            greater than short_lookback. Defaults to 100.
+
+    If fewer draws are available than requested, frequencies are based on
+    the actual number of draws in each window. If both windows contain the
+    same draws, all frequency differences are zero.
+
+    Ties are resolved by choosing the number with more appearances in the
+    short window, then fewer in the long window, then the smaller number.
+    Six numbers are always picked, even if fewer than six have a positive
+    frequency difference.
+
+    With no history, the strategy returns 1 through 6. The same history and
+    parameters always produce the same result, sorted from smallest to largest.
+    """
+
     def __init__(self, params: dict[str, str]) -> None:
         self._short_lookback = parse_positive_int_param(
             params,
