@@ -1,7 +1,15 @@
 from dataclasses import dataclass
 
 from . import lotto_client
-from .core import AbstractStrategy, GameRecord, GameType, LottoDrawRecord, StrategyRegistry, UnknownStrategyError
+from .core import (
+    AbstractStrategy,
+    GameRecord,
+    GameType,
+    LottoDrawRecord,
+    StrategyRegistry,
+    UnknownStrategyError,
+    select_draw_numbers,
+)
 from .metrics import BacktestReport, MetricsCalculator
 
 
@@ -20,6 +28,7 @@ class PreparedSimulation:
     strategy: AbstractStrategy
     data: list[LottoDrawRecord]
     total_games: int
+    lotto_plus: bool = False
 
 
 @dataclass
@@ -34,19 +43,21 @@ def generate_numbers(
     date_from: str | None,
     date_to: str | None,
     top: int,
+    lotto_plus: bool = False,
 ) -> PreparedGeneration:
     strategy = resolve_strategy(strategy_name, params)
     requires_data = strategy_requires_data(strategy_name)
 
     if requires_data:
         data = lotto_client.get_draw_results(date_from, date_to, top)
+        draws = select_draw_numbers(data, lotto_plus)
 
-        if not data:
+        if not draws:
             return PreparedGeneration(numbers=None)
     else:
-        data = []
+        draws = []
 
-    strategy.prepare_data(data)
+    strategy.prepare_data(draws)
     return PreparedGeneration(numbers=strategy.generate_numbers())
 
 
@@ -56,6 +67,7 @@ def prepare_simulation(
     date_from: str | None,
     date_to: str | None,
     top: int | None,
+    lotto_plus: bool = False,
 ) -> PreparedSimulation:
     strategy = resolve_strategy(strategy_name, params)
     data = lotto_client.get_draw_results(date_from, date_to, top)
@@ -66,6 +78,7 @@ def prepare_simulation(
         strategy=strategy,
         data=data,
         total_games=total_games,
+        lotto_plus=lotto_plus,
     )
 
 

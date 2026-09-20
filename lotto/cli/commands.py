@@ -20,19 +20,20 @@ def _run_default_command(
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
     top: Annotated[int, typer.Option('--top', min=1)] = 100,
+    lotto_plus: Annotated[bool, typer.Option('--lotto-plus')] = False,
 ) -> None:
     if ctx.invoked_subcommand is not None:
         return
 
     if strategy_name is None:
-        if inputs.has_default_generate_inputs(params, date_from, date_to, top):
+        if inputs.has_default_generate_inputs(params, date_from, date_to, top, lotto_plus):
             rendering.show_root_help_and_exit(ctx)
 
         raise typer.BadParameter('Option --strategy is required in default generate mode.', param_hint='--strategy')
 
     inputs.validate_date_options(date_from, date_to)
     params_dict = inputs.parse_params(params)
-    generation = _prepare_generation(strategy_name, params_dict, date_from, date_to, top)
+    generation = _prepare_generation(strategy_name, params_dict, date_from, date_to, top, lotto_plus)
 
     if generation.numbers is None:
         rendering.show_no_draw_results()
@@ -47,12 +48,15 @@ def _run_simulation(
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
     top: Annotated[int | None, typer.Option('--top', min=1)] = None,
+    lotto_plus: Annotated[bool, typer.Option('--lotto-plus')] = False,
 ) -> None:
     inputs.validate_date_options(date_from, date_to)
     params_dict = inputs.parse_params(params)
 
     with rendering.fetching_status():
-        prepared_simulation = service_calls.prepare_simulation(strategy_name, params_dict, date_from, date_to, top)
+        prepared_simulation = service_calls.prepare_simulation(
+            strategy_name, params_dict, date_from, date_to, top, lotto_plus
+        )
 
     if not prepared_simulation.data:
         rendering.show_no_draw_results()
@@ -78,11 +82,12 @@ def _prepare_generation(
     date_from: str | None,
     date_to: str | None,
     top: int,
+    lotto_plus: bool = False,
 ) -> services.PreparedGeneration:
     requires_data = service_calls.get_strategy_requires_data(strategy_name)
 
     if requires_data:
         with rendering.fetching_status():
-            return service_calls.generate_numbers(strategy_name, params, date_from, date_to, top)
+            return service_calls.generate_numbers(strategy_name, params, date_from, date_to, top, lotto_plus)
 
-    return service_calls.generate_numbers(strategy_name, params, date_from, date_to, top)
+    return service_calls.generate_numbers(strategy_name, params, date_from, date_to, top, lotto_plus)

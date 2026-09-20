@@ -1,13 +1,14 @@
 import datetime
 from collections.abc import Iterator
 
-from .core import AbstractStrategy, GameRecord, GameType, LottoDrawRecord
+from .core import AbstractStrategy, GameRecord, GameType, LottoDrawRecord, select_draw_numbers
 
 
 class BacktestEngine:
-    def __init__(self, strategy: AbstractStrategy) -> None:
+    def __init__(self, strategy: AbstractStrategy, lotto_plus: bool = False) -> None:
         self._history: list[GameRecord] = []
         self._strategy = strategy
+        self._lotto_plus = lotto_plus
 
     @property
     def history(self) -> list[GameRecord]:
@@ -21,7 +22,8 @@ class BacktestEngine:
         sorted_data = sorted(data, key=lambda record: record.draw_date)
 
         for index, record in enumerate(sorted_data):
-            self._strategy.prepare_data(sorted_data[:index])
+            draws = select_draw_numbers(sorted_data[:index], self._lotto_plus)
+            self._strategy.prepare_data(draws)
 
             for game_type, draw_result in self._get_game_results(record):
                 yield self._handle_game(record.draw_date, game_type, draw_result)

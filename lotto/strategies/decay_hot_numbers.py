@@ -1,6 +1,6 @@
 from collections import Counter
 
-from ..core import AbstractRankedStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ..core import AbstractRankedStrategy, StrategyMetadata, StrategyRegistry
 from ._params import parse_float_between_param, parse_non_negative_int_param
 
 _default_params = {
@@ -18,10 +18,11 @@ class DecayHotNumbers(AbstractRankedStrategy):
     Pick six numbers from 1 to 49, giving more importance to recent draws.
 
     Available as 'decay-hot-numbers', this strategy adds points each time a
-    number appears in the selected Lotto draws. The latest draw adds 1 point,
+    number appears in the selected draws. The latest draw adds 1 point,
     the previous draw adds decay points, the one before adds decay ** 2,
     and so on. The six numbers with the most points are picked. Age is counted
-    in draws, not days. Lotto Plus results are not used.
+    in draws, not days. The supplied history can contain Lotto or Lotto Plus
+    draws.
 
     Parameters:
         lookback: Number of recent draws to consider. Defaults to 100.
@@ -40,19 +41,19 @@ class DecayHotNumbers(AbstractRankedStrategy):
     def __init__(self, params: dict[str, str]) -> None:
         self._lookback = parse_non_negative_int_param(params, 'lookback', _default_params['lookback'])
         self._decay = parse_float_between_param(params, 'decay', _default_params['decay'], 0, 1)
-        self._data: list[LottoDrawRecord] = []
+        self._draws: list[list[int]] = []
 
-    def prepare_data(self, data: list[LottoDrawRecord]) -> None:
-        self._data = data
+    def prepare_data(self, draws: list[list[int]]) -> None:
+        self._draws = draws
 
     def rank_numbers(self) -> list[int]:
-        draws = self._data[-self._lookback :] if self._lookback else self._data
+        draws = self._draws[-self._lookback :] if self._lookback else self._draws
         counter = Counter()
 
-        for age, record in enumerate(reversed(draws)):
+        for age, numbers in enumerate(reversed(draws)):
             weight = self._decay**age
 
-            for number in record.lotto_numbers:
+            for number in numbers:
                 if 1 <= number <= self.POOL_MAX:
                     counter[number] += weight
 

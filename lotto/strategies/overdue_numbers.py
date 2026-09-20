@@ -1,4 +1,4 @@
-from ..core import AbstractRankedStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ..core import AbstractRankedStrategy, StrategyMetadata, StrategyRegistry
 from ._params import parse_non_negative_int_param
 
 _default_params = {
@@ -15,11 +15,11 @@ class OverdueNumbers(AbstractRankedStrategy):
     Pick six numbers from 1 to 49 that have not appeared for the longest time.
 
     Available as 'overdue-numbers', this strategy checks when each number last
-    appeared in the selected Lotto draws. Numbers that did not appear in those
+    appeared in the selected draws. Numbers that did not appear in those
     draws are picked first, followed by those whose last appearance was
     furthest back. Only the last appearance matters, not how often a number
-    appeared. Time is measured in draws, not days. Lotto Plus results are
-    not used.
+    appeared. Time is measured in draws, not days. The supplied history can
+    contain Lotto or Lotto Plus draws.
 
     Parameters:
         lookback: Number of recent draws to consider. Defaults to 100.
@@ -36,17 +36,17 @@ class OverdueNumbers(AbstractRankedStrategy):
 
     def __init__(self, params: dict[str, str]) -> None:
         self._lookback = parse_non_negative_int_param(params, 'lookback', _default_params['lookback'])
-        self._data: list[LottoDrawRecord] = []
+        self._draws: list[list[int]] = []
 
-    def prepare_data(self, data: list[LottoDrawRecord]) -> None:
-        self._data = data
+    def prepare_data(self, draws: list[list[int]]) -> None:
+        self._draws = draws
 
     def rank_numbers(self) -> list[int]:
-        draws = self._data[-self._lookback :] if self._lookback else self._data
+        draws = self._draws[-self._lookback :] if self._lookback else self._draws
         last_seen_index: dict[int, int] = {}
 
-        for index, record in enumerate(draws):
-            for number in record.lotto_numbers:
+        for index, numbers in enumerate(draws):
+            for number in numbers:
                 if 1 <= number <= self.POOL_MAX:
                     last_seen_index[number] = index
 

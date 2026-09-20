@@ -45,5 +45,6 @@ def has_default_generate_inputs(
     date_from: str | None,
     date_to: str | None,
     top: int,
+    lotto_plus: bool = False,
 ) -> bool:
-    return params is None and date_from is None and date_to is None and top == 100
+    return params is None and date_from is None and date_to is None and top == 100 and not lotto_plus

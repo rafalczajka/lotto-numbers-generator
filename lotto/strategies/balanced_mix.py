@@ -1,4 +1,4 @@
-from ..core import AbstractRankedStrategy, AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ..core import AbstractRankedStrategy, AbstractStrategy, StrategyMetadata, StrategyRegistry
 from .decay_hot_numbers import DecayHotNumbers
 from .overdue_numbers import OverdueNumbers
 from .rising_numbers import RisingNumbers
@@ -18,7 +18,8 @@ class BalancedMix(AbstractStrategy):
     Available as 'balanced-mix', this strategy takes two numbers from each of
     decay-hot-numbers, rising-numbers, and overdue-numbers. They favor recent
     appearances, a recent rise in frequency, and a long gap since the last
-    appearance, respectively. All three use Lotto results, not Lotto Plus.
+    appearance, respectively. All three use the same source of history,
+    which can contain Lotto or Lotto Plus draws.
 
     Numbers are picked one at a time in this order: decay, rising, overdue,
     overdue, rising, decay. Each strategy supplies its highest-ranked number
@@ -78,9 +79,9 @@ class BalancedMix(AbstractStrategy):
         self._strategies: tuple[AbstractRankedStrategy, ...] = (decay, rising, overdue)
         self._selection_order = (decay, rising, overdue, overdue, rising, decay)
 
-    def prepare_data(self, data: list[LottoDrawRecord]) -> None:
+    def prepare_data(self, draws: list[list[int]]) -> None:
         for strategy in self._strategies:
-            strategy.prepare_data(data)
+            strategy.prepare_data(draws)
 
     def generate_numbers(self) -> list[int]:
         rankings = {strategy: strategy.rank_numbers() for strategy in self._strategies}

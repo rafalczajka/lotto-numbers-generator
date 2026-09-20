@@ -1,6 +1,6 @@
 from collections import Counter
 
-from ..core import AbstractRankedStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ..core import AbstractRankedStrategy, StrategyMetadata, StrategyRegistry
 from ._params import parse_positive_int_param
 
 _default_params = {
@@ -21,7 +21,7 @@ class RisingNumbers(AbstractRankedStrategy):
     number appears per draw in a short recent window and a longer window.
     The longer window includes the shorter one. Numbers with the largest
     difference between their short-window and long-window frequencies are
-    picked first. Lotto Plus results are not used.
+    picked first. The supplied history can contain Lotto or Lotto Plus draws.
 
     Parameters:
         short_lookback: Number of recent draws used to measure the recent
@@ -57,23 +57,23 @@ class RisingNumbers(AbstractRankedStrategy):
         if self._short_lookback >= self._long_lookback:
             raise ValueError('Parameter short_lookback must be less than long_lookback.')
 
-        self._data: list[LottoDrawRecord] = []
+        self._draws: list[list[int]] = []
 
-    def prepare_data(self, data: list[LottoDrawRecord]) -> None:
-        self._data = data
+    def prepare_data(self, draws: list[list[int]]) -> None:
+        self._draws = draws
 
     def rank_numbers(self) -> list[int]:
-        long_draws = self._data[-self._long_lookback :]
+        long_draws = self._draws[-self._long_lookback :]
         short_draws = long_draws[-self._short_lookback :]
 
         long_counter = Counter()
         short_counter = Counter()
 
-        for record in long_draws:
-            long_counter.update([n for n in record.lotto_numbers if 1 <= n <= self.POOL_MAX])
+        for numbers in long_draws:
+            long_counter.update([n for n in numbers if 1 <= n <= self.POOL_MAX])
 
-        for record in short_draws:
-            short_counter.update([n for n in record.lotto_numbers if 1 <= n <= self.POOL_MAX])
+        for numbers in short_draws:
+            short_counter.update([n for n in numbers if 1 <= n <= self.POOL_MAX])
 
         long_draws_count = max(len(long_draws), 1)
         short_draws_count = max(len(short_draws), 1)

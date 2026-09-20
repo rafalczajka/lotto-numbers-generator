@@ -20,9 +20,10 @@ def generate_numbers(
     date_from: str | None,
     date_to: str | None,
     top: int,
+    lotto_plus: bool = False,
 ) -> services.PreparedGeneration:
     try:
-        return services.generate_numbers(strategy_name, params, date_from, date_to, top)
+        return services.generate_numbers(strategy_name, params, date_from, date_to, top, lotto_plus)
     except (UnknownStrategyError, services.StrategyParamError) as exc:
         raise _map_service_error(exc) from exc
 
@@ -33,9 +34,10 @@ def prepare_simulation(
     date_from: str | None,
     date_to: str | None,
     top: int | None,
+    lotto_plus: bool = False,
 ) -> services.PreparedSimulation:
     try:
-        return services.prepare_simulation(strategy_name, params, date_from, date_to, top)
+        return services.prepare_simulation(strategy_name, params, date_from, date_to, top, lotto_plus)
     except (UnknownStrategyError, services.StrategyParamError) as exc:
         raise _map_service_error(exc) from exc
 
@@ -44,7 +46,7 @@ def run_backtest(
     prepared_simulation: services.PreparedSimulation,
     on_result: Callable[[], None],
 ) -> tuple[list[GameRecord], services.SimulationSummary]:
-    backtest = BacktestEngine(prepared_simulation.strategy)
+    backtest = BacktestEngine(prepared_simulation.strategy, lotto_plus=prepared_simulation.lotto_plus)
     results: list[GameRecord] = []
 
     for result in backtest.results_gen(prepared_simulation.data):

@@ -1,6 +1,6 @@
 import random
 
-from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
+from ..core import AbstractStrategy, StrategyMetadata, StrategyRegistry
 from ._params import parse_int_param
 
 _metadata = StrategyMetadata(
@@ -37,7 +37,7 @@ class Baseline(AbstractStrategy):
 
         self._rng = random.Random(seed)
 
-    def prepare_data(self, _: list[LottoDrawRecord]) -> None:
+    def prepare_data(self, _: list[list[int]]) -> None:
         pass
 
     def generate_numbers(self) -> list[int]:
