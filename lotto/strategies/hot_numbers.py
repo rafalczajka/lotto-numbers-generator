@@ -13,6 +13,30 @@ _metadata = StrategyMetadata()
 
 @StrategyRegistry.register('hot-numbers', _metadata)
 class HotNumbers(AbstractStrategy):
+    """
+    Pick the six numbers from 1 to 49 that appeared most often in past draws.
+
+    Available as 'hot-numbers', this strategy counts how often each number
+    appears in the selected Lotto draws and picks those with the highest
+    counts. Every appearance counts equally, regardless of how recent it is.
+    Lotto Plus results are not used.
+
+    Parameters:
+        lookback: Number of recent draws to consider. Defaults to 100.
+            Use 0 to include all available draws. If fewer draws are
+            available than requested, all of them are used.
+
+    When numbers have the same count, the one encountered first while
+    reading the selected draws is picked first. This also depends on the
+    order of numbers within each draw. If fewer than six different numbers
+    appeared, the remaining places are filled with unused numbers from
+    smallest to largest.
+
+    With no history, the strategy returns 1 through 6. The same history in
+    the same order and the same parameters always produce the same result.
+    Results are returned from smallest to largest.
+    """
+
     def __init__(self, params: dict[str, str]) -> None:
         self._lookback = parse_non_negative_int_param(params, 'lookback', _default_params['lookback'])
         self._data: list[LottoDrawRecord] = []
