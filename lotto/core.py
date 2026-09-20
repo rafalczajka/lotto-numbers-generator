@@ -17,9 +17,6 @@ class LottoDrawRecord:
 
 
 def select_draw_numbers(data: list[LottoDrawRecord], lotto_plus: bool = False) -> list[list[int]]:
-    """
-    Extract non-empty draws from the selected game, keeping their order.
-    """
     draws = [record.plus_numbers if lotto_plus else record.lotto_numbers for record in data]
     return [numbers for numbers in draws if numbers]
 
@@ -39,9 +36,6 @@ class AbstractStrategy(ABC):
 
     @abstractmethod
     def prepare_data(self, draws: list[list[int]]) -> None:
-        """
-        Accept non-empty draws from oldest to newest, from either game.
-        """
         raise NotImplementedError
 
     @abstractmethod

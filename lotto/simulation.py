@@ -24,12 +24,18 @@ class BacktestEngine:
         for index, record in enumerate(sorted_data):
             draws = select_draw_numbers(sorted_data[:index], self._lotto_plus)
             self._strategy.prepare_data(draws)
+            generated_numbers = self._strategy.generate_numbers()
 
             for game_type, draw_result in self._get_game_results(record):
-                yield self._handle_game(record.draw_date, game_type, draw_result)
+                yield self._handle_game(record.draw_date, game_type, draw_result, generated_numbers)
 
-    def _handle_game(self, draw_date: datetime.date, game_type: GameType, draw_result: list[int]) -> GameRecord:
-        generated_numbers = self._strategy.generate_numbers()
+    def _handle_game(
+        self,
+        draw_date: datetime.date,
+        game_type: GameType,
+        draw_result: list[int],
+        generated_numbers: list[int],
+    ) -> GameRecord:
         matches = self._count_matches(draw_result, generated_numbers)
 
         new_record = GameRecord(
