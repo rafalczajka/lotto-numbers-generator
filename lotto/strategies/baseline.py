@@ -10,6 +10,24 @@ _metadata = StrategyMetadata(
 
 @StrategyRegistry.register('random', _metadata)
 class Baseline(AbstractStrategy):
+    """
+    Pick six different random numbers from 1 to 49.
+
+    Available as 'random', this strategy is a simple starting point for
+    comparing other strategies. Every set of six numbers has the same chance
+    of being picked. Past draw results do not affect the selection, so the
+    strategy works without any history.
+
+    Parameters:
+        seed: Optional integer that makes results repeatable. Two new
+            instances using the same seed produce the same sequence of sets.
+            When omitted, the random generator chooses its own starting state.
+
+    Each call picks another set, even when a seed is provided. A number cannot
+    appear twice in one set, but it can appear again in later sets. Results
+    are returned from smallest to largest.
+    """
+
     def __init__(self, params: dict[str, str]) -> None:
         seed = parse_int_param(params, 'seed')
 
