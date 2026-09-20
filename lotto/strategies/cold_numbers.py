@@ -13,6 +13,24 @@ _metadata = StrategyMetadata()
 
 @StrategyRegistry.register('cold-numbers', _metadata)
 class ColdNumbers(AbstractStrategy):
+    """
+    Pick the six numbers from 1 to 49 that appeared least often in past draws.
+
+    Available as 'cold-numbers', this strategy counts how often each number
+    appears in the selected Lotto draws and picks those with the lowest
+    counts. Numbers that did not appear at all are picked first. Lotto Plus
+    results are not used.
+
+    Parameters:
+        lookback: Number of recent draws to consider. Defaults to 100.
+            Use 0 to include all available draws. If fewer draws are
+            available than requested, all of them are used.
+
+    When numbers have the same count, the smaller number is picked first.
+    With no history, the strategy returns 1 through 6. The same history and
+    parameters always produce the same result, sorted from smallest to largest.
+    """
+
     def __init__(self, params: dict[str, str]) -> None:
         self._lookback = parse_non_negative_int_param(params, 'lookback', _default_params['lookback'])
         self._data: list[LottoDrawRecord] = []
