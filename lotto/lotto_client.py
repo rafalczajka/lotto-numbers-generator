@@ -1,7 +1,7 @@
 from datetime import datetime
 from json import JSONDecodeError
 
-import httpx
+import httpx2
 
 from .api_client.api.draw_results import get_draw_results as get_draw_results_operation
 from .api_client.client import AuthenticatedClient
@@ -66,7 +66,7 @@ def _get_raw_draw_results_response(
     date_from: str | None,
     date_to: str | None,
     top: int | None,
-) -> httpx.Response:
+) -> httpx2.Response:
     params = {'dateFrom': date_from, 'dateTo': date_to, 'top': top}
     params = {key: value for key, value in params.items() if value is not None}
 
